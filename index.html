@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health AI Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Include marked.js for better Markdown rendering if needed, though we can handle it manually -->
+    <!-- Include html2pdf.js for PDF generation -->
+    <!-- Include jspdf standalone for precise coordinate-based reports -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div class="app-wrapper">
+        <header class="app-header">
+            <div class="logo">
+                <span class="logo-icon">🧠</span>
+                <h1>Health AI</h1>
+            </div>
+            <p class="subtitle">Personalized Patient Education</p>
+        </header>
+
+        <main class="main-content">
+            <section class="controls-card glass-panel">
+                <div class="form-group">
+                    <label for="condition">Health Condition <span class="required">*</span></label>
+                    <div class="input-with-button">
+                        <input id="condition" type="text" placeholder="e.g. Diabetes, Hypertension..." required />
+                        <button id="micBtn" class="mic-btn" onclick="startDictation()" type="button" title="Use Voice Input">🎤</button>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="literacy">Literacy Level</label>
+                        <select id="literacy">
+                            <option value="Simple">Simple</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age">Age Group</label>
+                        <select id="age">
+                            <option value="Child">Child</option>
+                            <option value="Adult" selected>Adult</option>
+                            <option value="Elderly">Elderly</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="language">Language</label>
+                        <select id="language">
+                            <option value="English">🇬🇧 English</option>
+                            <option value="Tamil">🇮🇳 Tamil</option>
+                            <option value="Hindi">🇮🇳 Hindi</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="learning-mode-wrapper" style="display: flex; align-items: center; gap: 12px; margin-top: 10px; background: rgba(0,0,0,0.15); padding: 12px; border-radius: 12px;">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="learningMode">
+                        <span class="slider"></span>
+                    </label>
+                    <span class="toggle-label" style="font-weight: 600; font-size: 0.95rem; color: #f8fafc;">🌍 Learning Mode (Bilingual Layout)</span>
+                </div>
+
+                <button id="generateBtn" class="primary-btn" onclick="generate()">
+                    <span class="btn-text">Generate Guide</span>
+                    <div class="spinner hidden"></div>
+                </button>
+            </section>
+
+            <section id="results-container" class="results-container hidden">
+                <div class="results-action-bar" style="display: flex; justify-content: flex-end; align-items: center;">
+                    <div style="display: flex; gap: 10px;">
+                        <button class="action-btn listen-btn" onclick="toggleSpeech()">
+                            🔊 <span id="listenText">Listen</span>
+                        </button>
+                        <button class="action-btn download-btn" onclick="downloadPDF()">
+                            📄 Download Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Risk Dashboard Section -->
+                <div id="risk-dashboard" class="glass-panel hidden" style="margin-bottom: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h3 style="margin: 0; color: var(--accent);">Risk Assessment</h3>
+                        <span id="risk-label" class="risk-badge"></span>
+                    </div>
+                    <div class="risk-meter-bg">
+                        <div id="risk-meter-fill"></div>
+                    </div>
+                    <p id="risk-explanation" style="font-size: 0.95rem; color: var(--text-muted); margin-top: 10px;"></p>
+                </div>
+
+                <div id="output" class="output-stack">
+                    <!-- Sections will be injected here -->
+                </div>
+
+                <!-- Chat Follow-up Section -->
+                <div id="chat-card" class="glass-panel hidden" style="margin-top: 32px; display: flex; flex-direction: column; gap: 20px;">
+                    <div style="border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+                        <h3 style="margin: 0; color: var(--accent); display: flex; align-items: center; gap: 8px;">
+                            🗨️ Follow-up Questions
+                        </h3>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">Ask about foods to avoid, exercises, or specific concerns.</p>
+                    </div>
+                    
+                    <div id="chat-history" class="chat-history">
+                        <!-- Chat messages injected here -->
+                    </div>
+
+                    <div class="chat-input-row" style="display: flex; gap: 12px;">
+                        <input type="text" id="chatInput" placeholder="Ask a follow-up question..." onkeypress="if(event.key === 'Enter') sendFollowUp()" />
+                        <button id="chatSendBtn" onclick="sendFollowUp()" class="primary-btn" style="margin: 0; padding: 0 25px; min-width: 100px;">
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p class="disclaimer">
+                ⚠️ This is for educational purposes only. Always consult a doctor for medical advice.
+            </p>
+        </footer>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>

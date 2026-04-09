@@ -91,7 +91,7 @@ Do NOT include any extra text.
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer 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",
+                "Authorization": "Bearer Your API KEY",
                 "HTTP-Referer": "http://localhost",
                 "X-Title": "Health AI App"
             },

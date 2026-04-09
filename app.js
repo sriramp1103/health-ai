@@ -96,7 +96,7 @@ Do NOT include any extra text.
                 "X-Title": "Health AI App"
             },
             body: JSON.stringify({
-                model: "openai/gpt-4o-mini",
+                model: "openai/gpt-oss-120b:free",
                 messages: [{ role: "user", content: prompt }]
             })
         });

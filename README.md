@@ -34,7 +34,6 @@ Web Speech API (Voice input/output)
 │── README.md
 ⚙️ Setup Instructions
 Clone the repository:
-git clone https://github.com/your-username/health-ai-app.git
 Open the project folder
 Replace your API key in app.js:
 Authorization: "Bearer YOUR_API_KEY"
